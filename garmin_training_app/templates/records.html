@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runners Log - Records</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260408b" />
+</head>
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="menu-btn" aria-label="Open sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>Records</h1>
+  </header>
+
+  <div id="overlay" class="overlay"></div>
+  <aside id="sidebar" class="drawer">
+    <h2>Menu</h2>
+    <nav class="drawer-nav">
+      <a class="drawer-link" href="/">Home</a>
+      <a class="drawer-link active" href="/records">Records</a>
+      <a class="drawer-link" href="/overview">Overall Improvement</a>
+      <a class="drawer-link" href="/planner">Metric Calendar</a>
+      <a class="drawer-link" href="/goals">Goals</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <section class="panel controls">
+      <h2>Records</h2>
+      <label for="watchPath">Watch Activity Folder</label>
+      <input id="watchPath" type="text" value="{{ default_watch_path }}" />
+      <button id="importBtn">Import From Connected Watch</button>
+      <p id="status" class="status"></p>
+    </section>
+
+    <section class="panel list">
+      <h2>All Runs</h2>
+      <p class="sub">Click any row to open that run’s session details page.</p>
+      <table id="activityTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Sport</th>
+            <th>Miles</th>
+            <th>Avg Pace</th>
+            <th>Avg HR</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/static/common.js?v=20260408b"></script>
+  <script src="/static/records.js?v=20260408b"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Summit Log Calendar</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260406b" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">Summit Log</div>
+        <h1>Calendar and workout log.</h1>
+        <p>Review sessions by week, scan stress totals, and open deeper analysis on each workout.</p>
+      </div>
+      <nav class="side-nav">
+        <a class="side-link" href="/">Dashboard</a>
+        <a class="side-link active" href="/calendar">Calendar</a>
+        <a class="side-link" href="/workouts/new">Add Workout</a>
+        <a class="side-link" href="/settings">Thresholds</a>
+      </nav>
+    </aside>
+
+    <main class="page">
+      <section class="hero slim">
+        <div>
+          <div class="eyebrow">Calendar</div>
+          <h2>Weekly training log</h2>
+          <p>Each workout now carries pace or power-derived stress and intensity markers, not just raw duration.</p>
+        </div>
+      </section>
+
+      <section id="weeksContainer" class="week-stack"></section>
+    </main>
+  </div>
+  <script src="/static/common.js?v=20260406b"></script>
+  <script src="/static/calendar.js?v=20260406b"></script>
+</body>
+</html>

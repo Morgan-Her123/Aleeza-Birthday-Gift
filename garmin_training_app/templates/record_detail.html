@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runners Log - Session Details</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260408b" />
+</head>
+<body>
+  <header class="topbar">
+    <button id="menuBtn" class="menu-btn" aria-label="Open sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>Session Details</h1>
+  </header>
+
+  <div id="overlay" class="overlay"></div>
+  <aside id="sidebar" class="drawer">
+    <h2>Menu</h2>
+    <nav class="drawer-nav">
+      <a class="drawer-link" href="/">Home</a>
+      <a class="drawer-link active" href="/records">Records</a>
+      <a class="drawer-link" href="/overview">Overall Improvement</a>
+      <a class="drawer-link" href="/planner">Metric Calendar</a>
+      <a class="drawer-link" href="/goals">Goals</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    {% set fb = feedback if feedback is defined else {'grade_label': '', 'notes': ''} %}
+    {% set grades = grade_options if grade_options is defined else ['A+','A','A-','B+','B','B-','C+','C','C-','D','F'] %}
+    <section class="panel">
+      <a href="/records">&larr; Back to records</a>
+      <h2 style="margin-top:8px;">{{ activity.source_name }}</h2>
+      {% if saved is defined and saved %}
+      <p class="sub" style="color:#166534;">Workout note and grade saved.</p>
+      {% endif %}
+      <div class="cards">
+        <div class="card"><div class="k">Date</div><div class="v" id="sessionDatePretty">{{ activity.start_time_local or '-' }}</div></div>
+        <div class="card"><div class="k">Event</div><div class="v">{{ activity.event_label or '-' }}</div></div>
+        <div class="card"><div class="k">Distance</div><div class="v">{{ '%.3f'|format(activity.distance_miles or 0) }} mi</div></div>
+        <div class="card"><div class="k">Avg Pace</div><div class="v">{{ '%.2f'|format(activity.avg_pace_min_per_mile or 0) }} min/mi</div></div>
+        <div class="card"><div class="k">Avg HR</div><div class="v">{{ activity.avg_hr_bpm or '-' }}</div></div>
+        <div class="card"><div class="k">Ascent</div><div class="v">{{ '%.1f'|format(activity.ascent_ft or 0) }} ft</div></div>
+        <div class="card"><div class="k">Descent</div><div class="v">{{ '%.1f'|format(activity.descent_ft or 0) }} ft</div></div>
+      </div>
+
+      {% if ts_stats %}
+      <h3>Session Summary</h3>
+      <div class="cards">
+        <div class="card"><div class="k">Data Points</div><div class="v">{{ ts_stats.points }}</div></div>
+        <div class="card"><div class="k">Avg Cadence</div><div class="v">{{ '%.1f'|format(ts_stats.avg_cadence or 0) }} spm</div></div>
+        <div class="card"><div class="k">Max Cadence</div><div class="v">{{ '%.0f'|format(ts_stats.max_cadence or 0) }} spm</div></div>
+        <div class="card"><div class="k">Avg Speed</div><div class="v">{{ '%.2f'|format(ts_stats.avg_speed or 0) }} mph</div></div>
+        <div class="card"><div class="k">Avg HR</div><div class="v">{{ '%.1f'|format(ts_stats.avg_hr or 0) }} bpm</div></div>
+        <div class="card"><div class="k">Total Gain</div><div class="v">{{ '%.1f'|format(ts_stats.total_gain or 0) }} ft</div></div>
+      </div>
+      {% endif %}
+
+      {% if activity.plot_path %}
+      <div class="plot-wrap plot-wrap-small">
+        <img class="plot-small" src="/plots/{{ activity.plot_path.replace('plots/','') }}" alt="Activity graph" />
+      </div>
+      {% endif %}
+    </section>
+
+    <section class="panel">
+      <h3>{{ review_label if review_label is defined else 'Workout' }} Workout Journal And Grade</h3>
+      <form method="post" action="/session/{{ activity.id }}">
+        <label for="gradeLabel">Workout Grade</label>
+        <select id="gradeLabel" name="grade_label">
+          <option value="">Select grade</option>
+          {% for g in grades %}
+          <option value="{{ g }}" {% if fb.grade_label == g %}selected{% endif %}>{{ g }}</option>
+          {% endfor %}
+        </select>
+
+        <label for="workoutNotes" style="margin-top:10px;">Training Notes</label>
+        <textarea id="workoutNotes" name="workout_notes" rows="6" placeholder="How it felt, what worked, what to improve...">{{ fb.notes or '' }}</textarea>
+        <button type="submit">Save Note And Grade</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="/static/common.js?v=20260408b"></script>
+  <script>
+    (function () {
+      var el = document.getElementById('sessionDatePretty');
+      if (!el) return;
+      var raw = (el.textContent || '').trim();
+      if (!raw || raw === '-') return;
+      var d = new Date(raw);
+      if (isNaN(d.getTime())) return;
+      el.textContent = d.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    })();
+  </script>
+</body>
+</html>

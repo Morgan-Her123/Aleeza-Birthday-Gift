@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homework HQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <aside class="sidebar">
+        <div class="brand-card">
+          <p class="eyebrow">Study flow, simplified</p>
+          <h1>Homework HQ</h1>
+          <p class="brand-copy">
+            A deadline-first planner for classes, assignments, reminders, and
+            momentum.
+          </p>
+        </div>
+
+        <section class="panel nav-panel">
+          <div class="section-head">
+            <h2>Pages</h2>
+          </div>
+          <nav id="page-nav" class="page-nav">
+            <button class="page-link active" data-page="home" type="button">
+              Home
+            </button>
+            <button class="page-link" data-page="dashboard" type="button">
+              Dashboard
+            </button>
+            <button class="page-link" data-page="calendar" type="button">
+              Calendar
+            </button>
+            <button class="page-link" data-page="tasks" type="button">
+              Tasks
+            </button>
+            <button class="page-link" data-page="projects" type="button">
+              Projects
+            </button>
+            <button class="page-link" data-page="assignments" type="button">
+              Assignments
+            </button>
+          </nav>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Classes</h2>
+            <span id="class-count" class="chip subtle"></span>
+          </div>
+          <div id="class-list" class="class-list"></div>
+          <form id="class-form" class="stack-form">
+            <input id="class-name" type="text" placeholder="Add class" required />
+            <input id="class-teacher" type="text" placeholder="Teacher" />
+            <input id="class-schedule" type="text" placeholder="Schedule" />
+            <input
+              id="class-color"
+              type="color"
+              value="#ff8a5b"
+              aria-label="Class color"
+            />
+            <button type="submit">Create class</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Reminders</h2>
+            <button id="enable-notifications" class="ghost-button" type="button">
+              Enable alerts
+            </button>
+          </div>
+          <div id="reminder-list" class="reminder-list"></div>
+        </section>
+
+        <section class="panel">
+          <div class="section-head">
+            <h2>Backup</h2>
+          </div>
+          <div class="backup-actions">
+            <button id="export-data" type="button">Export plan</button>
+            <label class="import-label">
+              Import plan
+              <input id="import-data" type="file" accept="application/json" />
+            </label>
+          </div>
+        </section>
+      </aside>
+
+      <main class="main-content">
+        <section id="page-home" class="app-page active">
+          <section class="hero">
+            <div>
+              <p class="eyebrow">Daily dashboard</p>
+              <h2>Your schoolwork at a glance</h2>
+              <p class="hero-copy">
+                See what is due today, what is coming next, and what deserves your
+                attention first.
+              </p>
+            </div>
+            <div class="hero-actions">
+              <button id="start-fresh" class="ghost-button" type="button">
+                Start fresh
+              </button>
+              <button id="clear-completed" type="button">Archive submitted</button>
+            </div>
+          </section>
+
+          <section class="dashboard-grid">
+            <article class="metric-card accent-a">
+              <p>Due today</p>
+              <strong id="metric-due-today">0</strong>
+              <span id="metric-due-today-note">Nothing urgent.</span>
+            </article>
+            <article class="metric-card accent-b">
+              <p>Due this week</p>
+              <strong id="metric-due-week">0</strong>
+              <span id="metric-due-week-note">Weekly load is clear.</span>
+            </article>
+            <article class="metric-card accent-c">
+              <p>Overdue</p>
+              <strong id="metric-overdue">0</strong>
+              <span id="metric-overdue-note">You are caught up.</span>
+            </article>
+            <article class="metric-card accent-d">
+              <p>Completed this week</p>
+              <strong id="metric-completed">0</strong>
+              <span id="metric-completed-note">Keep the streak going.</span>
+            </article>
+          </section>
+
+          <section class="dashboard-panels">
+            <article class="panel">
+              <div class="section-head">
+                <h2>What is due today?</h2>
+              </div>
+              <div id="due-today-list" class="dashboard-list"></div>
+            </article>
+            <article class="panel">
+              <div class="section-head">
+                <h2>What is due soon?</h2>
+              </div>
+              <div id="due-soon-list" class="dashboard-list"></div>
+            </article>
+            <article class="panel">
+              <div class="section-head">
+                <h2>What should I start next?</h2>
+              </div>
+              <div id="next-up-list" class="dashboard-list"></div>
+            </article>
+          </section>
+
+          <section class="workspace-grid">
+            <section class="panel">
+              <div class="section-head">
+                <h2>Quick add assignment</h2>
+                <span class="chip">Under 10 seconds</span>
+              </div>
+              <form id="assignment-form" class="assignment-form">
+                <input id="title-input" type="text" placeholder="Assignment title" required />
+                <select id="class-input" required></select>
+                <input id="due-input" type="datetime-local" required />
+                <select id="priority-input">
+                  <option value="low">Low priority</option>
+                  <option value="medium" selected>Medium priority</option>
+                  <option value="high">High priority</option>
+                  <option value="urgent">Urgent priority</option>
+                </select>
+                <select id="status-input">
+                  <option value="not_started">Not started</option>
+                  <option value="in_progress">In progress</option>
+                  <option value="waiting">Waiting / blocked</option>
+                  <option value="completed">Completed</option>
+                  <option value="submitted">Submitted</option>
+                </select>
+                <input
+                  id="effort-input"
+                  type="number"
+                  min="0.5"
+                  step="0.5"
+                  placeholder="Hours"
+                />
+                <input
+                  id="weight-input"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="5"
+                  placeholder="Grade weight %"
+                />
+                <select id="recurring-input">
+                  <option value="none">No recurrence</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="biweekly">Every 2 weeks</option>
+                  <option value="weekdays">Weekdays</option>
+                </select>
+                <input
+                  id="natural-input"
+                  type="text"
+                  placeholder='Quick text: "Worksheet Friday 9am"'
+                />
+                <button type="submit">Add assignment</button>
+              </form>
+              <p id="form-status" class="inline-note"></p>
+            </section>
+
+            <section class="panel">
+              <div class="section-head">
+                <h2>Progress by subject</h2>
+              </div>
+              <div id="subject-progress" class="subject-progress"></div>
+              <div class="section-head secondary-head">
+                <h2>Weekly summary</h2>
+              </div>
+              <div id="weekly-summary" class="weekly-summary"></div>
+            </section>
+          </section>
+        </section>
+
+        <section id="page-calendar" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Calendar</p>
+              <h2>Month view</h2>
+              <p class="hero-copy">
+                See all assignments laid out by date and jump into any day quickly.
+              </p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h2>Calendar and deadlines</h2>
+              <div class="calendar-controls">
+                <button id="prev-month" class="ghost-button" type="button">Prev</button>
+                <span id="calendar-label" class="chip subtle"></span>
+                <button id="next-month" class="ghost-button" type="button">Next</button>
+              </div>
+            </div>
+            <div class="calendar-weekdays">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+            <div id="calendar-grid" class="calendar-grid"></div>
+          </section>
+        </section>
+
+        <section id="page-dashboard" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Dashboard</p>
+              <h2>Class by class overview</h2>
+              <p class="hero-copy">
+                See every class, the next assignment due for each one, and how urgent it is.
+              </p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h2>Classes and next deadlines</h2>
+              <span id="dashboard-class-count" class="chip subtle"></span>
+            </div>
+            <div id="class-dashboard-list" class="class-dashboard-list"></div>
+          </section>
+        </section>
+
+        <section id="page-tasks" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Tasks</p>
+              <h2>Work to do next</h2>
+              <p class="hero-copy">
+                Focus on active assignments, unfinished steps, and what needs attention first.
+              </p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h2>Task queue</h2>
+              <span id="task-count" class="chip subtle"></span>
+            </div>
+            <div id="task-list" class="task-list"></div>
+          </section>
+        </section>
+
+        <section id="page-projects" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Projects</p>
+              <h2>Bigger assignments with steps</h2>
+              <p class="hero-copy">
+                Track longer assignments, multi-step work, and projects that need planning.
+              </p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h2>Project board</h2>
+              <span id="project-count" class="chip subtle"></span>
+            </div>
+            <div id="project-list" class="project-list"></div>
+          </section>
+        </section>
+
+        <section id="page-assignments" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Assignments</p>
+              <h2>Assignments and due dates</h2>
+              <p class="hero-copy">
+                Filter work by today, week, overdue, or upcoming and manage each assignment in detail.
+              </p>
+            </div>
+          </section>
+
+          <section class="workspace-grid">
+            <section class="panel">
+              <div class="section-head">
+                <h2>Filters and search</h2>
+                <button id="reset-filters" class="ghost-button" type="button">
+                  Reset
+                </button>
+              </div>
+              <div class="filter-grid">
+                <input id="search-input" type="search" placeholder="Search homework" />
+                <select id="filter-class"></select>
+                <select id="filter-status">
+                  <option value="all">All statuses</option>
+                  <option value="not_started">Not started</option>
+                  <option value="in_progress">In progress</option>
+                  <option value="waiting">Waiting / blocked</option>
+                  <option value="completed">Completed</option>
+                  <option value="submitted">Submitted</option>
+                </select>
+                <select id="filter-priority">
+                  <option value="all">All priorities</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+                <label class="toggle">
+                  <input id="filter-attachments" type="checkbox" />
+                  <span>Only with resources</span>
+                </label>
+                <label class="toggle">
+                  <input id="filter-overdue" type="checkbox" />
+                  <span>Only overdue</span>
+                </label>
+              </div>
+
+              <div class="view-tabs" id="view-tabs">
+                <button class="tab active" data-view="today" type="button">Today</button>
+                <button class="tab" data-view="week" type="button">This week</button>
+                <button class="tab" data-view="month" type="button">Calendar month</button>
+                <button class="tab" data-view="overdue" type="button">Overdue</button>
+                <button class="tab" data-view="upcoming" type="button">Upcoming</button>
+                <button class="tab" data-view="all" type="button">All</button>
+              </div>
+            </section>
+
+            <section class="panel">
+              <div class="section-head">
+                <h2>Assignments</h2>
+                <span id="assignment-count" class="chip subtle"></span>
+              </div>
+              <div id="assignment-list" class="assignment-list"></div>
+            </section>
+          </section>
+
+          <section class="workspace-grid lower-grid">
+            <section class="panel">
+              <div class="section-head">
+                <h2>Assignment details</h2>
+                <span id="detail-title" class="chip subtle">Select an assignment</span>
+              </div>
+              <div id="detail-empty" class="empty-state">
+                Click an assignment to manage subtasks, notes, submission status,
+                reminders, and resources.
+              </div>
+              <form id="detail-form" class="detail-form hidden">
+              <div class="detail-grid">
+                <label>
+                  Title
+                  <input id="detail-assignment-title" type="text" />
+                </label>
+                <label>
+                  Class
+                  <select id="detail-class"></select>
+                </label>
+                <label>
+                  Due
+                  <input id="detail-due" type="datetime-local" />
+                </label>
+                <label>
+                  Status
+                  <select id="detail-status">
+                    <option value="not_started">Not started</option>
+                    <option value="in_progress">In progress</option>
+                    <option value="waiting">Waiting / blocked</option>
+                    <option value="completed">Completed</option>
+                    <option value="submitted">Submitted</option>
+                  </select>
+                </label>
+                <label>
+                  Submission
+                  <select id="detail-submission">
+                    <option value="not_submitted">Not submitted</option>
+                    <option value="finished">Finished</option>
+                    <option value="submitted_online">Submitted online</option>
+                    <option value="turned_in_physically">Turned in physically</option>
+                    <option value="confirmed">Confirmed by teacher / LMS</option>
+                  </select>
+                </label>
+                <label>
+                  Priority
+                  <select id="detail-priority">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="urgent">Urgent</option>
+                  </select>
+                </label>
+                <label>
+                  Estimated effort (hours)
+                  <input id="detail-effort" type="number" min="0" step="0.5" />
+                </label>
+                <label>
+                  Grade weight (%)
+                  <input id="detail-weight" type="number" min="0" max="100" step="5" />
+                </label>
+                <label>
+                  Availability
+                  <select id="detail-availability">
+                    <option value="light">Light day</option>
+                    <option value="normal">Normal day</option>
+                    <option value="busy">Busy day</option>
+                  </select>
+                </label>
+                <label>
+                  Recurring pattern
+                  <select id="detail-recurring">
+                    <option value="none">No recurrence</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">Every 2 weeks</option>
+                    <option value="weekdays">Weekdays</option>
+                  </select>
+                </label>
+                <label>
+                  Custom reminder
+                  <input id="detail-reminder" type="datetime-local" />
+                </label>
+                <label>
+                  Blocked reason
+                  <input id="detail-blocked" type="text" placeholder="Waiting on..." />
+                </label>
+              </div>
+
+              <div class="progress-strip">
+                <div>
+                  <p class="small-label">Progress</p>
+                  <strong id="detail-progress">0%</strong>
+                </div>
+                <div>
+                  <p class="small-label">Checklist</p>
+                  <strong id="detail-checklist">0 / 0</strong>
+                </div>
+                <div>
+                  <p class="small-label">Smart score</p>
+                  <strong id="detail-score">0</strong>
+                </div>
+              </div>
+
+              <label>
+                Notes
+                <textarea id="detail-notes" rows="4"></textarea>
+              </label>
+              <label>
+                Teacher comments
+                <textarea id="detail-comments" rows="3"></textarea>
+              </label>
+              <label>
+                Rubric
+                <textarea id="detail-rubric" rows="3"></textarea>
+              </label>
+              <label>
+                Group project info
+                <textarea id="detail-group" rows="3"></textarea>
+              </label>
+              <label>
+                Links and resources (one per line)
+                <textarea
+                  id="detail-links"
+                  rows="4"
+                  placeholder="https://example.com/article&#10;Photo folder&#10;Worksheet PDF"
+                ></textarea>
+              </label>
+
+              <section class="subtask-section">
+                <div class="section-head">
+                  <h3>Task breakdown</h3>
+                  <button id="add-subtask" class="ghost-button" type="button">
+                    Add step
+                  </button>
+                </div>
+                <div id="subtask-list" class="subtask-list"></div>
+              </section>
+
+              <div class="detail-actions">
+                <button id="save-detail" type="submit">Save changes</button>
+                <button id="create-next-recurring" class="ghost-button" type="button">
+                  Create next recurring copy
+                </button>
+                <button id="delete-assignment" class="danger-button" type="button">
+                  Delete assignment
+                </button>
+              </div>
+            </form>
+            </section>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <template id="assignment-card-template">
+      <article class="assignment-card">
+        <div class="assignment-card-head">
+          <div>
+            <p class="assignment-class"></p>
+            <h3 class="assignment-title"></h3>
+          </div>
+          <span class="assignment-score chip"></span>
+        </div>
+        <div class="assignment-meta"></div>
+        <div class="assignment-tags"></div>
+        <div class="assignment-progress">
+          <div class="progress-bar"><span></span></div>
+          <p class="progress-copy"></p>
+        </div>
+        <div class="assignment-actions">
+          <button class="select-button" type="button">Open</button>
+          <button class="toggle-status ghost-button" type="button">Advance status</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

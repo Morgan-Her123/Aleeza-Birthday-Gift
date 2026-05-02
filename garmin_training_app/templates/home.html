@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runners Log</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260408b" />
+</head>
+<body class="home-bg home-compact">
+  <div class="home-backdrop" aria-hidden="true">
+    <img src="/static/italian%20dlomites%201.jpg" alt="" />
+  </div>
+  <header class="topbar">
+    <button id="menuBtn" class="menu-btn" aria-label="Open sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <h1>Runners Log</h1>
+  </header>
+
+  <div id="overlay" class="overlay"></div>
+  <aside id="sidebar" class="drawer">
+    <h2>Menu</h2>
+    <nav class="drawer-nav">
+      <a class="drawer-link active" href="/">Home</a>
+      <a class="drawer-link" href="/records">Records</a>
+      <a class="drawer-link" href="/overview">Overall Improvement</a>
+      <a class="drawer-link" href="/planner">Metric Calendar</a>
+      <a class="drawer-link" href="/goals">Goals</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <section class="panel">
+      <h2>Welcome</h2>
+      <p class="sub">Use the menu to open records or overall improvement.</p>
+      <div class="cards">
+        <a class="card" href="/records"><div class="k">Go To</div><div class="v">Records</div></a>
+        <a class="card" href="/overview"><div class="k">Go To</div><div class="v">Overall Improvement</div></a>
+        <a class="card" href="/planner"><div class="k">Go To</div><div class="v">Metric Calendar</div></a>
+        <a class="card" href="/goals"><div class="k">Go To</div><div class="v">Goals</div></a>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/common.js?v=20260408b"></script>
+</body>
+</html>

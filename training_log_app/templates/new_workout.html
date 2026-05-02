@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Workout</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260406b" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">Summit Log</div>
+        <h1>Log a workout fast.</h1>
+        <p>Add enough signal for the analyzer to estimate rTSS, TSS, sTSS, or strength load automatically.</p>
+      </div>
+      <nav class="side-nav">
+        <a class="side-link" href="/">Dashboard</a>
+        <a class="side-link" href="/calendar">Calendar</a>
+        <a class="side-link active" href="/workouts/new">Add Workout</a>
+        <a class="side-link" href="/settings">Thresholds</a>
+      </nav>
+    </aside>
+
+    <main class="page">
+      <section class="hero slim">
+        <div>
+          <div class="eyebrow">Manual Entry</div>
+          <h2>Create a new workout</h2>
+          <p>Your current thresholds are baked into the analyzer as soon as this workout is saved.</p>
+        </div>
+      </section>
+
+      <section class="panel threshold-note">
+        <div class="cards cards-three">
+          <article class="card"><div class="k">FTP</div><div class="v-small">{{ settings.ftp }} W</div></article>
+          <article class="card"><div class="k">Threshold Pace</div><div class="v-small">{{ settings.threshold_pace_text }}</div></article>
+          <article class="card"><div class="k">Threshold HR</div><div class="v-small">{{ settings.threshold_hr }} bpm</div></article>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <form id="workoutForm" class="form-grid">
+          <label>
+            Title
+            <input name="title" type="text" placeholder="Tempo Run" required />
+          </label>
+          <label>
+            Sport
+            <select name="sport" id="sportSelect">
+              <option>Run</option>
+              <option>Bike</option>
+              <option>Swim</option>
+              <option>Strength</option>
+            </select>
+          </label>
+          <label>
+            Start Time
+            <input name="start_time" type="datetime-local" required />
+          </label>
+          <label>
+            Duration Minutes
+            <input name="duration_minutes" type="number" min="1" value="60" required />
+          </label>
+          <label>
+            Distance Miles
+            <input name="distance_miles" type="number" min="0" step="0.1" value="6.0" />
+          </label>
+          <label>
+            Elevation Ft
+            <input name="elevation_ft" type="number" min="0" step="1" value="250" />
+          </label>
+          <label>
+            Average HR
+            <input name="avg_hr" type="number" min="0" step="1" value="148" />
+          </label>
+          <label>
+            Average Power
+            <input name="avg_power" type="number" min="0" step="1" placeholder="Bike only, if available" />
+          </label>
+          <label>
+            Intensity
+            <select name="intensity">
+              <option>Recovery</option>
+              <option selected>Endurance</option>
+              <option>Tempo</option>
+              <option>Threshold</option>
+              <option>VO2</option>
+              <option>Race</option>
+              <option>Strength</option>
+            </select>
+          </label>
+          <label>
+            RPE
+            <input name="rpe" type="number" min="1" max="10" value="6" required />
+          </label>
+          <label class="full">
+            Notes
+            <textarea name="notes" rows="5" placeholder="How did it feel? What mattered?"></textarea>
+          </label>
+          <div class="full form-actions">
+            <button type="submit">Save Workout</button>
+            <p id="formStatus" class="status"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+  <script src="/static/common.js?v=20260406b"></script>
+  <script src="/static/new_workout.js?v=20260406b"></script>
+</body>
+</html>

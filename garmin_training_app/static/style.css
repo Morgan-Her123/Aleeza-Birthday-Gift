@@ -1,0 +1,549 @@
+:root {
+  --bg: #ecf7fb;
+  --panel: rgba(241, 249, 252, 0.9);
+  --text: #15324a;
+  --muted: #516f80;
+  --line: #c9dce7;
+  --aqua: #0fc7b4;
+  --green: #1ea87f;
+  --green-deep: #17785d;
+  --orange: #f06b55;
+  --blue: #63b7ff;
+  --blue-deep: #3f95e8;
+  --gold: #dfb45a;
+  --gold-soft: #f5de9e;
+  --accent: var(--aqua);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, rgba(99, 183, 255, 0.44), transparent 50%),
+    radial-gradient(circle at left, rgba(30, 168, 127, 0.32), transparent 45%),
+    radial-gradient(circle at bottom right, rgba(223, 180, 90, 0.34), transparent 46%),
+    radial-gradient(circle at bottom left, rgba(240, 107, 85, 0.24), transparent 38%),
+    linear-gradient(180deg, #e4f2fc 0%, #d8eaf8 52%, #dff2ec 100%);
+}
+
+body.home-bg {
+  background:
+    linear-gradient(140deg, rgba(10, 22, 33, 0.52) 0%, rgba(9, 17, 27, 0.42) 55%, rgba(8, 18, 14, 0.48) 100%),
+    url('/static/italian%20dlomites%201.jpg') center/cover no-repeat fixed;
+}
+
+.home-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.home-backdrop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.82) saturate(1.05);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(205, 233, 250, 0.95), rgba(188, 223, 248, 0.95));
+  backdrop-filter: blur(6px);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.menu-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(233, 249, 255, 0.95), rgba(222, 243, 255, 0.95));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+
+.menu-btn span {
+  display: block;
+  height: 2px;
+  background: var(--blue);
+  border-radius: 2px;
+}
+
+.menu-fab {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 50;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: var(--blue);
+  font-size: 14px;
+  box-shadow: 0 8px 18px rgba(30, 57, 82, 0.14);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 24, 39, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 35;
+}
+
+.overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
+  z-index: 40;
+  padding: 18px;
+  background: linear-gradient(180deg, #d7e9f2 0%, #cfe5ef 52%, #d4ece7 100%);
+  border-right: 1px solid var(--line);
+  box-shadow: 0 12px 30px rgba(13, 30, 47, 0.2);
+  transform: translateX(-102%);
+  transition: transform 0.2s ease;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer h2 {
+  margin: 0 0 14px;
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-link {
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.45);
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.drawer-link.active {
+  color: #fff;
+  background: linear-gradient(95deg, var(--green), var(--blue-deep), var(--orange));
+  border-color: var(--blue-deep);
+}
+
+.content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+.panel {
+  background: linear-gradient(160deg, rgba(216, 239, 252, 0.95) 0%, rgba(206, 240, 229, 0.95) 45%, rgba(246, 227, 185, 0.94) 100%);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 18px rgba(30, 57, 82, 0.06);
+}
+
+h2, h3 { margin: 0 0 10px; }
+.sub { margin: 0 0 12px; color: var(--muted); }
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+select {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--text);
+}
+
+textarea {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  font-size: 15px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+button {
+  margin-top: 10px;
+  border: none;
+  color: #fff;
+  background: linear-gradient(92deg, var(--orange), var(--gold), var(--blue-deep));
+  border-radius: 10px;
+  padding: 11px 16px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.status { min-height: 20px; color: var(--muted); margin-top: 8px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td {
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  padding: 9px 8px;
+  font-size: 13px;
+}
+
+tr.pickable { cursor: pointer; }
+tr.pickable:hover { background: #f2f8fd; }
+tr.selected { background: #e7fff5; }
+
+.week-row td {
+  background: linear-gradient(95deg, rgba(229, 245, 255, 0.93), rgba(226, 246, 238, 0.93), rgba(245, 239, 221, 0.92));
+  border-bottom: 1px solid #cfe3ee;
+}
+
+.week-group-start td,
+.week-group-mid td,
+.week-group-end td {
+  border-left: 1px solid var(--blue-deep);
+  border-right: 1px solid var(--blue-deep);
+}
+
+.week-group-start td {
+  border-top: 1px solid var(--blue-deep);
+}
+
+.week-group-end td {
+  border-bottom: 1px solid var(--blue-deep);
+}
+
+.week-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.week-icon-btn {
+  border: 1px solid var(--line);
+  background: rgba(230, 246, 255, 0.92);
+  color: var(--blue-deep);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.week-summary-row.hidden {
+  display: none;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.card {
+  display: block;
+  text-decoration: none;
+  color: var(--text);
+  background: linear-gradient(150deg, rgba(214, 240, 255, 0.97) 0%, rgba(206, 244, 232, 0.96) 48%, rgba(245, 224, 178, 0.94) 100%);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.card .k {
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 3px;
+}
+
+.card .v {
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: var(--blue-deep);
+}
+
+.plot-wrap {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #d9ecf7 0%, #d2e8f5 100%);
+  overflow: hidden;
+}
+
+.plot-wrap-small {
+  width: 560px;
+  max-width: 100%;
+  margin-top: 12px;
+}
+
+.plot-small {
+  width: 100%;
+  height: 260px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.chart-fixed-size {
+  width: 560px !important;
+  max-width: 100%;
+  display: block;
+}
+
+.home-compact .content {
+  max-width: 980px;
+  padding-top: 10px;
+}
+
+.home-compact .panel {
+  padding: 12px;
+}
+
+.home-compact .cards .card .v {
+  font-size: 18px;
+}
+
+.planner-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.planner-form button {
+  margin-top: 0;
+}
+
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.calendar-dow {
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 0;
+  font-weight: 600;
+}
+
+.calendar-cell {
+  min-height: 74px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(235, 247, 253, 0.95) 0%, rgba(232, 247, 241, 0.94) 56%, rgba(245, 239, 224, 0.9) 100%);
+  padding: 8px;
+}
+
+.calendar-cell.muted {
+  background: rgba(255, 255, 255, 0.45);
+  border-style: dashed;
+}
+
+.calendar-cell.day {
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendar-cell.day:focus {
+  outline: none;
+}
+
+.calendar-cell.day:hover {
+  background: linear-gradient(180deg, #e5f4ff 0%, #e3f4ef 56%, #f4ecd8 100%);
+}
+
+.calendar-cell.today {
+  border-color: #94d8cc;
+  background: #ecfffb;
+}
+
+.calendar-cell.selected-day {
+  border-color: var(--blue-deep);
+  box-shadow: inset 0 0 0 2px var(--blue-deep);
+  background: #e9f4ff;
+}
+
+.day-number {
+  font-weight: 700;
+  font-size: 13px;
+  color: #15324a;
+  margin-bottom: 4px;
+}
+
+.day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.day-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.today-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(92deg, var(--orange), var(--blue-deep));
+  border-radius: 999px;
+  padding: 4px 7px;
+  letter-spacing: 0.2px;
+}
+
+.sync-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: 700;
+  color: #0f3552;
+  background: linear-gradient(90deg, rgba(164, 230, 255, 0.96), rgba(196, 242, 230, 0.96));
+  border: 1px solid rgba(77, 165, 214, 0.75);
+  border-radius: 999px;
+  padding: 3px 7px;
+}
+
+.plan-day-complete {
+  border-color: #57b58b;
+  box-shadow: inset 0 0 0 1px rgba(35, 154, 103, 0.45);
+}
+
+.plan-complete-row td {
+  background: rgba(225, 245, 236, 0.7);
+}
+
+.check-mark {
+  color: #118c49;
+  font-weight: 800;
+}
+
+.day-count {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.day-workouts {
+  display: grid;
+  gap: 4px;
+}
+
+.day-workout {
+  font-size: 12px;
+  line-height: 1.25;
+  color: var(--text);
+  background: #e8f8ff;
+  border: 1px solid #c1e2f7;
+  border-radius: 6px;
+  padding: 2px 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.day-more {
+  font-size: 11px;
+  color: #476179;
+}
+
+.planner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.planner-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(92deg, var(--orange), var(--gold), var(--blue-deep));
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.delete-plan-btn {
+  margin-top: 0;
+  padding: 7px 10px;
+  font-size: 12px;
+}

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threshold Settings</title>
+  <link rel="stylesheet" href="/static/style.css?v=20260406b" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">Summit Log</div>
+        <h1>Threshold settings.</h1>
+        <p>These values drive the stress scores, intensity factor, and fitness modeling throughout the app.</p>
+      </div>
+      <nav class="side-nav">
+        <a class="side-link" href="/">Dashboard</a>
+        <a class="side-link" href="/calendar">Calendar</a>
+        <a class="side-link" href="/workouts/new">Add Workout</a>
+        <a class="side-link active" href="/settings">Thresholds</a>
+      </nav>
+    </aside>
+
+    <main class="page">
+      <section class="hero slim">
+        <div>
+          <div class="eyebrow">Athlete Profile</div>
+          <h2>Set the analyzer targets</h2>
+          <p>Change these and the entire dashboard recalculates against the new baseline.</p>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <form id="settingsForm" class="form-grid">
+          <label>
+            Athlete Name
+            <input name="athlete_name" type="text" value="{{ settings.athlete_name }}" required />
+          </label>
+          <label>
+            FTP
+            <input name="ftp" type="number" min="1" value="{{ settings.ftp }}" required />
+          </label>
+          <label>
+            Threshold HR
+            <input name="threshold_hr" type="number" min="1" value="{{ settings.threshold_hr }}" required />
+          </label>
+          <label>
+            Threshold Pace Seconds Per Mile
+            <input name="threshold_pace_seconds" type="number" min="1" value="{{ settings.threshold_pace_seconds }}" required />
+          </label>
+          <label>
+            Swim Threshold Seconds Per 100y
+            <input name="swim_threshold_seconds_per_100" type="number" min="1" value="{{ settings.swim_threshold_seconds_per_100 }}" required />
+          </label>
+          <div class="full form-actions">
+            <button type="submit">Save Thresholds</button>
+            <p id="settingsStatus" class="status"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+  <script src="/static/common.js?v=20260406b"></script>
+  <script src="/static/settings.js?v=20260406b"></script>
+</body>
+</html>
