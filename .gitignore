@@ -11,8 +11,23 @@ __pycache__/
 
 # Local app data
 *.db
+training_log_app/
+garmin_training_app/
 training_log_app/data/
 garmin_training_app/data/
+
+# Local side-project and media files outside Homework HQ
+*.gif
+*.mov
+*.mp4
+*.jpg
+*.jpeg
+*.png
+*.csv
+today_run_*.json
+generate_*.swift
+starship_*.py
+hello.py
 
 # Local Codex/runtime metadata
 .codex/

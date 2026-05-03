@@ -1,3 +1,0 @@
-flask>=3.0.0
-fitparse>=1.2.0
-matplotlib>=3.9.0
