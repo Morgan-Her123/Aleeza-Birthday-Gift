@@ -336,8 +336,8 @@ function loadState() {
 }
 
 function normalizeState(raw) {
-  const currentPage =
-    raw.ui?.currentPage === "deadlines" ? "assignments" : raw.ui?.currentPage || "home";
+  const oldPage = raw.ui?.currentPage;
+  const currentPage = oldPage === "deadlines" || oldPage === "assignments" ? "tasks" : oldPage || "home";
 
   return {
     classes: (raw.classes || []).map((item) => ({
@@ -847,18 +847,26 @@ function renderClassOptions() {
   const emptyOption = '<option value="">Create a class first</option>';
 
   els.classInput.innerHTML = state.classes.length ? options : emptyOption;
-  els.detailClass.innerHTML = state.classes.length ? options : emptyOption;
-  els.filterClass.innerHTML = `<option value="all">All classes</option>${options}`;
+  if (els.detailClass) {
+    els.detailClass.innerHTML = state.classes.length ? options : emptyOption;
+  }
+  if (els.filterClass) {
+    els.filterClass.innerHTML = `<option value="all">All classes</option>${options}`;
+  }
   els.classInput.disabled = state.classes.length === 0;
-  els.detailClass.disabled = state.classes.length === 0;
+  if (els.detailClass) {
+    els.detailClass.disabled = state.classes.length === 0;
+  }
 
   if (!state.classes.some((item) => item.id === els.classInput.value)) {
     els.classInput.value = state.classes[0]?.id || "";
   }
-  if (!state.classes.some((item) => item.id === els.detailClass.value)) {
+  if (els.detailClass && !state.classes.some((item) => item.id === els.detailClass.value)) {
     els.detailClass.value = state.classes[0]?.id || "";
   }
-  els.filterClass.value = state.ui.filterClass;
+  if (els.filterClass) {
+    els.filterClass.value = state.ui.filterClass;
+  }
 }
 
 function renderClasses() {
@@ -976,7 +984,7 @@ function renderDashboardList(container, items, emptyCopy) {
     `;
     card.addEventListener("click", () => {
       state.ui.selectedAssignmentId = assignment.id;
-      state.ui.currentPage = "assignments";
+      state.ui.currentPage = "tasks";
       saveAndRender();
     });
     container.appendChild(card);
@@ -1035,7 +1043,7 @@ function renderClassDashboard() {
     applyClassAccent(row, classItem);
     row.addEventListener("click", () => {
       state.ui.selectedAssignmentId = assignment.id;
-      state.ui.currentPage = "assignments";
+      state.ui.currentPage = "tasks";
       saveAndRender();
     });
     els.classDashboardList.appendChild(row);
@@ -1099,7 +1107,7 @@ function renderCalendar() {
       chip.title = `${assignment.title} • ${formatDue(assignment.dueAt)}`;
       chip.addEventListener("click", () => {
         state.ui.selectedAssignmentId = assignment.id;
-        state.ui.currentPage = "assignments";
+        state.ui.currentPage = "tasks";
         saveAndRender();
       });
       dayEl.appendChild(chip);
@@ -1117,6 +1125,8 @@ function renderCalendar() {
 }
 
 function renderAssignments() {
+  if (!els.assignmentList || !els.assignmentCount) return;
+
   const assignments = filteredAssignments();
   els.assignmentCount.textContent = `${assignments.length} showing`;
   els.assignmentList.innerHTML = "";
@@ -1225,7 +1235,7 @@ function renderTasks() {
     card.querySelector(".assignment-class").style.color = classItem.color;
     card.addEventListener("click", () => {
       state.ui.selectedAssignmentId = assignment.id;
-      state.ui.currentPage = "assignments";
+      state.ui.currentPage = "tasks";
       saveAndRender();
     });
     els.taskList.appendChild(card);
@@ -1272,7 +1282,7 @@ function renderProjects() {
     card.querySelector(".assignment-class").style.color = classItem.color;
     card.addEventListener("click", () => {
       state.ui.selectedAssignmentId = assignment.id;
-      state.ui.currentPage = "assignments";
+      state.ui.currentPage = "projects";
       saveAndRender();
     });
     els.projectList.appendChild(card);
@@ -1340,6 +1350,8 @@ function renderSleepPage() {
 }
 
 function renderDetail() {
+  if (!els.detailForm || !els.detailTitle || !els.detailEmpty) return;
+
   const assignment = getSelectedAssignment();
   if (!assignment) {
     els.detailTitle.textContent = "Select an assignment";
@@ -1477,18 +1489,30 @@ function renderWeeklySummary() {
 }
 
 function renderFilters() {
+  if (
+    !els.searchInput ||
+    !els.filterStatus ||
+    !els.filterPriority ||
+    !els.filterAttachments ||
+    !els.filterOverdue
+  ) return;
+
   els.searchInput.value = state.ui.search;
   els.filterStatus.value = state.ui.filterStatus;
   els.filterPriority.value = state.ui.filterPriority;
   els.filterAttachments.checked = state.ui.filterAttachments;
   els.filterOverdue.checked = state.ui.filterOverdue;
 
-  [...els.viewTabs.querySelectorAll(".tab")].forEach((tab) => {
+  [...(els.viewTabs?.querySelectorAll(".tab") || [])].forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.view === state.ui.currentView);
   });
 }
 
 function renderPageNavigation() {
+  if (!document.getElementById(`page-${state.ui.currentPage}`)) {
+    state.ui.currentPage = "home";
+  }
+
   document.querySelectorAll(".app-page").forEach((page) => {
     page.classList.toggle("active", page.id === `page-${state.ui.currentPage}`);
   });
@@ -1875,10 +1899,10 @@ function bindEvents() {
   els.assignmentForm.addEventListener("submit", onAddAssignment);
   els.sleepScheduleForm.addEventListener("submit", onSaveSleepSchedule);
   els.sleepLogForm.addEventListener("submit", onLogSleep);
-  els.detailForm.addEventListener("submit", onSaveDetail);
-  els.addSubtask.addEventListener("click", addSubtask);
-  els.deleteAssignment.addEventListener("click", deleteSelectedAssignment);
-  els.createNextRecurring.addEventListener("click", () => {
+  els.detailForm?.addEventListener("submit", onSaveDetail);
+  els.addSubtask?.addEventListener("click", addSubtask);
+  els.deleteAssignment?.addEventListener("click", deleteSelectedAssignment);
+  els.createNextRecurring?.addEventListener("click", () => {
     const assignment = getSelectedAssignment();
     if (!assignment) return;
     ensureNextRecurringAssignment(assignment);
@@ -1888,38 +1912,38 @@ function bindEvents() {
   els.exportData.addEventListener("click", exportState);
   els.importData.addEventListener("change", importState);
   els.startFresh.addEventListener("click", startFresh);
-  els.resetFilters.addEventListener("click", resetFilters);
+  els.resetFilters?.addEventListener("click", resetFilters);
 
-  els.searchInput.addEventListener("input", (event) => {
+  els.searchInput?.addEventListener("input", (event) => {
     state.ui.search = event.target.value;
     saveAndRender();
   });
-  els.filterClass.addEventListener("change", (event) => {
+  els.filterClass?.addEventListener("change", (event) => {
     state.ui.filterClass = event.target.value;
     saveAndRender();
   });
-  els.filterStatus.addEventListener("change", (event) => {
+  els.filterStatus?.addEventListener("change", (event) => {
     state.ui.filterStatus = event.target.value;
     saveAndRender();
   });
-  els.filterPriority.addEventListener("change", (event) => {
+  els.filterPriority?.addEventListener("change", (event) => {
     state.ui.filterPriority = event.target.value;
     saveAndRender();
   });
-  els.filterAttachments.addEventListener("change", (event) => {
+  els.filterAttachments?.addEventListener("change", (event) => {
     state.ui.filterAttachments = event.target.checked;
     saveAndRender();
   });
-  els.filterOverdue.addEventListener("change", (event) => {
+  els.filterOverdue?.addEventListener("change", (event) => {
     state.ui.filterOverdue = event.target.checked;
     saveAndRender();
   });
 
-  els.viewTabs.addEventListener("click", (event) => {
+  els.viewTabs?.addEventListener("click", (event) => {
     const button = event.target.closest(".tab");
     if (!button) return;
     state.ui.currentView = button.dataset.view;
-    state.ui.currentPage = "assignments";
+    state.ui.currentPage = "tasks";
     saveAndRender();
   });
 
