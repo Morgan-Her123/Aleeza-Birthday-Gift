@@ -47,6 +47,9 @@ const els = {
   enableNotifications: document.getElementById("enable-notifications"),
   exportData: document.getElementById("export-data"),
   importData: document.getElementById("import-data"),
+  installPanel: document.getElementById("install-panel"),
+  installApp: document.getElementById("install-app"),
+  installStatus: document.getElementById("install-status"),
   startFresh: document.getElementById("start-fresh"),
   clearCompleted: document.getElementById("clear-completed"),
   dueTodayList: document.getElementById("due-today-list"),
@@ -150,6 +153,7 @@ const els = {
 };
 
 const assignmentTemplate = document.getElementById("assignment-card-template");
+let deferredInstallPrompt = null;
 
 let state = loadState();
 
@@ -1999,8 +2003,43 @@ function initializeSleepDefaults() {
   );
 }
 
+function initializePwa() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch((error) => {
+        console.warn("Could not register offline support.", error);
+      });
+    });
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    els.installPanel?.classList.remove("hidden");
+  });
+
+  els.installApp?.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) return;
+
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+
+    if (choice.outcome === "accepted") {
+      els.installStatus.textContent = "Homework HQ installed.";
+      els.installApp.classList.add("hidden");
+    }
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    els.installPanel?.classList.add("hidden");
+  });
+}
+
 bindEvents();
 initializeDefaults();
 initializeSleepDefaults();
+initializePwa();
 render();
 maybeSendNotifications();

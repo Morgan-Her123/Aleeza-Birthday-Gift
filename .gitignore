@@ -23,6 +23,8 @@ garmin_training_app/data/
 *.jpg
 *.jpeg
 *.png
+!icons/icon-192.png
+!icons/icon-512.png
 *.csv
 today_run_*.json
 generate_*.swift
