@@ -293,7 +293,8 @@ p {
 .workspace-grid,
 .detail-grid,
 .filter-grid,
-.assignment-form {
+.assignment-form,
+.sleep-grid {
   display: grid;
   gap: 16px;
 }
@@ -364,9 +365,14 @@ p {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.sleep-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .assignment-form button,
 .assignment-form input:first-child,
-.assignment-form #natural-input {
+.assignment-form #natural-input,
+.sleep-grid button {
   grid-column: span 2;
 }
 
@@ -454,8 +460,10 @@ p {
 .class-dashboard-list,
 .reminder-list,
 .dashboard-list,
+.sleep-home-summary,
 .task-list,
 .project-list,
+.sleep-log-list,
 .subtask-list,
 .subject-progress,
 .weekly-summary {
@@ -470,6 +478,7 @@ p {
 .dashboard-item,
 .task-card,
 .project-card,
+.sleep-log-card,
 .subtask-item,
 .subject-row,
 .summary-row {
@@ -530,6 +539,7 @@ p {
 .dashboard-item,
 .task-card,
 .project-card,
+.sleep-log-card,
 .subject-row,
 .summary-row {
   padding: 14px;
@@ -538,7 +548,8 @@ p {
 .class-card,
 .class-dashboard-card,
 .task-card,
-.project-card {
+.project-card,
+.sleep-log-card {
   display: grid;
   gap: 8px;
 }
@@ -728,6 +739,7 @@ p {
 
   .dashboard-grid,
   .assignment-form,
+  .sleep-grid,
   .filter-grid,
   .detail-grid,
   .progress-strip {
@@ -736,7 +748,8 @@ p {
 
   .assignment-form button,
   .assignment-form input:first-child,
-  .assignment-form #natural-input {
+  .assignment-form #natural-input,
+  .sleep-grid button {
     grid-column: span 1;
   }
 

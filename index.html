@@ -38,6 +38,9 @@
             <button class="page-link" data-page="calendar" type="button">
               Calendar
             </button>
+            <button class="page-link" data-page="sleep" type="button">
+              Sleep
+            </button>
             <button class="page-link" data-page="tasks" type="button">
               Tasks
             </button>
@@ -223,6 +226,14 @@
               <div id="weekly-summary" class="weekly-summary"></div>
             </section>
           </section>
+
+          <section class="panel">
+            <div class="section-head">
+              <h2>Sleep snapshot</h2>
+              <span id="sleep-next-alert" class="chip subtle"></span>
+            </div>
+            <div id="sleep-home-summary" class="sleep-home-summary"></div>
+          </section>
         </section>
 
         <section id="page-calendar" class="app-page">
@@ -255,6 +266,116 @@
               <span>Sat</span>
             </div>
             <div id="calendar-grid" class="calendar-grid"></div>
+          </section>
+        </section>
+
+        <section id="page-sleep" class="app-page">
+          <section class="hero hero-compact">
+            <div>
+              <p class="eyebrow">Sleep</p>
+              <h2>Sleep schedule and alerts</h2>
+              <p class="hero-copy">
+                Set your bedtime routine, log your sleep, and get gentle reminders to protect your energy.
+              </p>
+            </div>
+          </section>
+
+          <section class="dashboard-grid">
+            <article class="metric-card accent-b">
+              <p>Bedtime goal</p>
+              <strong id="sleep-goal-bedtime">--</strong>
+              <span id="sleep-goal-note">Set a sleep schedule.</span>
+            </article>
+            <article class="metric-card accent-d">
+              <p>Wake goal</p>
+              <strong id="sleep-goal-wake">--</strong>
+              <span id="sleep-hours-note">Target sleep not set.</span>
+            </article>
+            <article class="metric-card accent-a">
+              <p>Last night</p>
+              <strong id="sleep-last-duration">--</strong>
+              <span id="sleep-last-note">No sleep logged yet.</span>
+            </article>
+            <article class="metric-card accent-c">
+              <p>7-day average</p>
+              <strong id="sleep-average-duration">--</strong>
+              <span id="sleep-average-note">Log a few nights to see trends.</span>
+            </article>
+          </section>
+
+          <section class="workspace-grid">
+            <section class="panel">
+              <div class="section-head">
+                <h2>Sleep schedule</h2>
+                <span class="chip">Alerts included</span>
+              </div>
+              <form id="sleep-schedule-form" class="sleep-grid">
+                <label>
+                  Bedtime goal
+                  <input id="sleep-bedtime-input" type="time" required />
+                </label>
+                <label>
+                  Wake goal
+                  <input id="sleep-wake-input" type="time" required />
+                </label>
+                <label>
+                  Target sleep hours
+                  <input id="sleep-target-hours-input" type="number" min="5" max="12" step="0.5" />
+                </label>
+                <label>
+                  Bedtime reminder
+                  <select id="sleep-alert-lead-input">
+                    <option value="15">15 minutes before</option>
+                    <option value="30">30 minutes before</option>
+                    <option value="45">45 minutes before</option>
+                    <option value="60">60 minutes before</option>
+                  </select>
+                </label>
+                <label class="toggle">
+                  <input id="sleep-bedtime-alerts-input" type="checkbox" />
+                  <span>Enable bedtime alerts</span>
+                </label>
+                <label class="toggle">
+                  <input id="sleep-wake-alerts-input" type="checkbox" />
+                  <span>Enable wake alerts</span>
+                </label>
+                <button type="submit">Save sleep schedule</button>
+              </form>
+              <p id="sleep-schedule-status" class="inline-note"></p>
+            </section>
+
+            <section class="panel">
+              <div class="section-head">
+                <h2>Log sleep</h2>
+                <span id="sleep-log-count" class="chip subtle"></span>
+              </div>
+              <form id="sleep-log-form" class="sleep-grid">
+                <label>
+                  Sleep date
+                  <input id="sleep-log-date" type="date" required />
+                </label>
+                <label>
+                  Fell asleep
+                  <input id="sleep-log-bedtime" type="datetime-local" required />
+                </label>
+                <label>
+                  Woke up
+                  <input id="sleep-log-wake" type="datetime-local" required />
+                </label>
+                <label>
+                  Sleep quality
+                  <select id="sleep-log-quality">
+                    <option value="great">Great</option>
+                    <option value="good">Good</option>
+                    <option value="okay" selected>Okay</option>
+                    <option value="rough">Rough</option>
+                  </select>
+                </label>
+                <button type="submit">Log sleep</button>
+              </form>
+              <p id="sleep-log-status" class="inline-note"></p>
+              <div id="sleep-log-list" class="sleep-log-list"></div>
+            </section>
           </section>
         </section>
 

@@ -52,6 +52,8 @@ const els = {
   dueTodayList: document.getElementById("due-today-list"),
   dueSoonList: document.getElementById("due-soon-list"),
   nextUpList: document.getElementById("next-up-list"),
+  sleepNextAlert: document.getElementById("sleep-next-alert"),
+  sleepHomeSummary: document.getElementById("sleep-home-summary"),
   dashboardClassCount: document.getElementById("dashboard-class-count"),
   classDashboardList: document.getElementById("class-dashboard-list"),
   taskCount: document.getElementById("task-count"),
@@ -66,6 +68,14 @@ const els = {
   metricOverdueNote: document.getElementById("metric-overdue-note"),
   metricCompleted: document.getElementById("metric-completed"),
   metricCompletedNote: document.getElementById("metric-completed-note"),
+  sleepGoalBedtime: document.getElementById("sleep-goal-bedtime"),
+  sleepGoalNote: document.getElementById("sleep-goal-note"),
+  sleepGoalWake: document.getElementById("sleep-goal-wake"),
+  sleepHoursNote: document.getElementById("sleep-hours-note"),
+  sleepLastDuration: document.getElementById("sleep-last-duration"),
+  sleepLastNote: document.getElementById("sleep-last-note"),
+  sleepAverageDuration: document.getElementById("sleep-average-duration"),
+  sleepAverageNote: document.getElementById("sleep-average-note"),
   assignmentForm: document.getElementById("assignment-form"),
   formStatus: document.getElementById("form-status"),
   titleInput: document.getElementById("title-input"),
@@ -77,6 +87,22 @@ const els = {
   weightInput: document.getElementById("weight-input"),
   recurringInput: document.getElementById("recurring-input"),
   naturalInput: document.getElementById("natural-input"),
+  sleepScheduleForm: document.getElementById("sleep-schedule-form"),
+  sleepBedtimeInput: document.getElementById("sleep-bedtime-input"),
+  sleepWakeInput: document.getElementById("sleep-wake-input"),
+  sleepTargetHoursInput: document.getElementById("sleep-target-hours-input"),
+  sleepAlertLeadInput: document.getElementById("sleep-alert-lead-input"),
+  sleepBedtimeAlertsInput: document.getElementById("sleep-bedtime-alerts-input"),
+  sleepWakeAlertsInput: document.getElementById("sleep-wake-alerts-input"),
+  sleepScheduleStatus: document.getElementById("sleep-schedule-status"),
+  sleepLogForm: document.getElementById("sleep-log-form"),
+  sleepLogDate: document.getElementById("sleep-log-date"),
+  sleepLogBedtime: document.getElementById("sleep-log-bedtime"),
+  sleepLogWake: document.getElementById("sleep-log-wake"),
+  sleepLogQuality: document.getElementById("sleep-log-quality"),
+  sleepLogStatus: document.getElementById("sleep-log-status"),
+  sleepLogCount: document.getElementById("sleep-log-count"),
+  sleepLogList: document.getElementById("sleep-log-list"),
   searchInput: document.getElementById("search-input"),
   filterClass: document.getElementById("filter-class"),
   filterStatus: document.getElementById("filter-status"),
@@ -155,6 +181,17 @@ function toLocalInputValue(dateLike) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(
     date.getHours()
   )}:${pad(date.getMinutes())}`;
+}
+
+function formatShortTime(timeValue) {
+  if (!timeValue) return "--";
+  const [hourRaw, minuteRaw] = timeValue.split(":");
+  const date = new Date();
+  date.setHours(Number(hourRaw || 0), Number(minuteRaw || 0), 0, 0);
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
 }
 
 function formatDue(dateLike) {
@@ -256,6 +293,28 @@ function parseLines(value) {
     .filter(Boolean);
 }
 
+function normalizeSleep(rawSleep) {
+  return {
+    bedtime: rawSleep?.bedtime || "22:30",
+    wakeTime: rawSleep?.wakeTime || "07:00",
+    targetHours: Number(rawSleep?.targetHours) || 8,
+    alertLeadMinutes: Number(rawSleep?.alertLeadMinutes) || 45,
+    bedtimeAlerts: rawSleep?.bedtimeAlerts !== false,
+    wakeAlerts: rawSleep?.wakeAlerts !== false,
+    logs: Array.isArray(rawSleep?.logs)
+      ? rawSleep.logs
+          .map((log) => ({
+            id: log.id || createId("sleep"),
+            date: log.date || new Date().toISOString().slice(0, 10),
+            bedtimeAt: log.bedtimeAt || "",
+            wakeAt: log.wakeAt || "",
+            quality: log.quality || "okay",
+          }))
+          .filter((log) => log.bedtimeAt && log.wakeAt)
+      : [],
+  };
+}
+
 function getClassById(classId) {
   return state.classes.find((item) => item.id === classId) || state.classes[0];
 }
@@ -290,6 +349,7 @@ function normalizeState(raw) {
       gradingWeight: item.gradingWeight || "",
     })),
     assignments: (raw.assignments || []).map(normalizeAssignment),
+    sleep: normalizeSleep(raw.sleep),
     ui: {
       selectedAssignmentId: raw.ui?.selectedAssignmentId || null,
       currentView: raw.ui?.currentView || "today",
@@ -343,6 +403,15 @@ function createEmptyState() {
   return normalizeState({
     classes: [],
     assignments: [],
+    sleep: {
+      bedtime: "22:30",
+      wakeTime: "07:00",
+      targetHours: 8,
+      alertLeadMinutes: 45,
+      bedtimeAlerts: true,
+      wakeAlerts: true,
+      logs: [],
+    },
     ui: {
       selectedAssignmentId: null,
       currentView: "today",
@@ -536,6 +605,84 @@ function activeAssignments() {
     .sort((a, b) => recommendationScore(b) - recommendationScore(a));
 }
 
+function sortSleepLogs(logs) {
+  return [...logs].sort((a, b) => new Date(b.wakeAt) - new Date(a.wakeAt));
+}
+
+function sleepDurationHours(log) {
+  const duration = (new Date(log.wakeAt) - new Date(log.bedtimeAt)) / 3_600_000;
+  return Math.max(0, duration);
+}
+
+function formatDuration(hours) {
+  if (!Number.isFinite(hours) || hours <= 0) return "--";
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.round((hours - wholeHours) * 60);
+  if (wholeHours === 0) return `${minutes}m`;
+  if (minutes === 0) return `${wholeHours}h`;
+  return `${wholeHours}h ${minutes}m`;
+}
+
+function sleepDateTimeFor(dateLike, timeValue) {
+  const date = new Date(dateLike);
+  const [hourRaw, minuteRaw] = (timeValue || "00:00").split(":");
+  date.setHours(Number(hourRaw || 0), Number(minuteRaw || 0), 0, 0);
+  return date;
+}
+
+function getNextSleepAlertInfo() {
+  const now = new Date();
+  const bedtimeAt = sleepDateTimeFor(now, state.sleep.bedtime);
+  const bedtimeReminderAt = new Date(
+    bedtimeAt.getTime() - state.sleep.alertLeadMinutes * 60_000
+  );
+  const wakeAt = sleepDateTimeFor(now, state.sleep.wakeTime);
+
+  if (state.sleep.bedtimeAlerts && bedtimeReminderAt > now) {
+    return `Bedtime alert ${new Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(bedtimeReminderAt)}`;
+  }
+
+  if (state.sleep.wakeAlerts && wakeAt > now) {
+    return `Wake alert ${new Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(wakeAt)}`;
+  }
+
+  if (state.sleep.bedtimeAlerts) {
+    const tomorrowReminder = new Date(
+      sleepDateTimeFor(addDays(now, 1), state.sleep.bedtime).getTime() -
+        state.sleep.alertLeadMinutes * 60_000
+    );
+    return `Next sleep alert ${new Intl.DateTimeFormat(undefined, {
+      weekday: "short",
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(tomorrowReminder)}`;
+  }
+
+  return "Sleep alerts off";
+}
+
+function sleepSummary() {
+  const logs = sortSleepLogs(state.sleep.logs);
+  const last = logs[0] || null;
+  const averagePool = logs.slice(0, 7);
+  const average =
+    averagePool.length > 0
+      ? averagePool.reduce((sum, log) => sum + sleepDurationHours(log), 0) / averagePool.length
+      : 0;
+
+  return {
+    last,
+    average,
+    nextAlert: getNextSleepAlertInfo(),
+  };
+}
+
 function soonestAssignmentForClass(classId) {
   return activeAssignments()
     .filter((item) => item.classId === classId)
@@ -611,6 +758,52 @@ function getReminderItems() {
         severity: 2,
       });
     }
+  }
+
+  const bedtimeAt = sleepDateTimeFor(now, state.sleep.bedtime);
+  const bedtimeReminderAt = new Date(
+    bedtimeAt.getTime() - state.sleep.alertLeadMinutes * 60_000
+  );
+  const wakeAt = sleepDateTimeFor(now, state.sleep.wakeTime);
+  const wakeReminderEndsAt = new Date(wakeAt.getTime() + 45 * 60_000);
+  const logs = sortSleepLogs(state.sleep.logs);
+  const lastLog = logs[0];
+
+  if (state.sleep.bedtimeAlerts && now >= bedtimeReminderAt && now <= bedtimeAt) {
+    reminders.push({
+      id: `sleep-bedtime-${startOfDay(now).toISOString()}`,
+      type: "Bedtime soon",
+      assignment: { title: "Sleep schedule" },
+      classItem: { name: "Sleep" },
+      body: `Your bedtime goal is ${formatShortTime(state.sleep.bedtime)}. Start winding down now.`,
+      severity: 4,
+    });
+  }
+
+  if (state.sleep.wakeAlerts && now >= wakeAt && now <= wakeReminderEndsAt) {
+    reminders.push({
+      id: `sleep-wake-${startOfDay(now).toISOString()}`,
+      type: "Wake routine",
+      assignment: { title: "Wake up" },
+      classItem: { name: "Sleep" },
+      body: `Wake goal is ${formatShortTime(state.sleep.wakeTime)}. Keep your morning routine steady.`,
+      severity: 3,
+    });
+  }
+
+  if (
+    lastLog &&
+    sleepDurationHours(lastLog) < Math.max(0, state.sleep.targetHours - 0.75) &&
+    isSameDay(lastLog.wakeAt, now)
+  ) {
+    reminders.push({
+      id: `sleep-recovery-${startOfDay(now).toISOString()}`,
+      type: "Sleep recovery",
+      assignment: { title: "Recover sleep" },
+      classItem: { name: "Sleep" },
+      body: `Last night was ${formatDuration(sleepDurationHours(lastLog))}. Aim for an easier evening tonight.`,
+      severity: 3,
+    });
   }
 
   return reminders.sort((a, b) => b.severity - a.severity).slice(0, 6);
@@ -731,6 +924,31 @@ function renderDashboard() {
   renderDashboardList(els.dueTodayList, dueToday, "No homework due today.");
   renderDashboardList(els.dueSoonList, dueSoon.slice(0, 4), "Nothing due in the next 72 hours.");
   renderDashboardList(els.nextUpList, nextUp, "Your queue is clear right now.");
+}
+
+function renderSleepHome() {
+  const summary = sleepSummary();
+  els.sleepNextAlert.textContent = summary.nextAlert;
+  els.sleepHomeSummary.innerHTML = "";
+
+  const rows = [
+    ["Bedtime goal", formatShortTime(state.sleep.bedtime)],
+    ["Wake goal", formatShortTime(state.sleep.wakeTime)],
+    ["Sleep target", `${state.sleep.targetHours} hours`],
+    [
+      "Last night",
+      summary.last
+        ? `${formatDuration(sleepDurationHours(summary.last))} • ${summary.last.quality}`
+        : "No sleep logged yet",
+    ],
+  ];
+
+  rows.forEach(([label, value]) => {
+    const row = document.createElement("article");
+    row.className = "summary-row";
+    row.innerHTML = `<strong>${label}</strong><small>${value}</small>`;
+    els.sleepHomeSummary.appendChild(row);
+  });
 }
 
 function renderDashboardList(container, items, emptyCopy) {
@@ -1061,6 +1279,66 @@ function renderProjects() {
   });
 }
 
+function renderSleepPage() {
+  const summary = sleepSummary();
+  const logs = sortSleepLogs(state.sleep.logs);
+
+  els.sleepGoalBedtime.textContent = formatShortTime(state.sleep.bedtime);
+  els.sleepGoalNote.textContent = summary.nextAlert;
+  els.sleepGoalWake.textContent = formatShortTime(state.sleep.wakeTime);
+  els.sleepHoursNote.textContent = `Target ${state.sleep.targetHours} hours nightly.`;
+  els.sleepLastDuration.textContent = summary.last
+    ? formatDuration(sleepDurationHours(summary.last))
+    : "--";
+  els.sleepLastNote.textContent = summary.last
+    ? `${summary.last.quality} sleep ending ${formatDue(summary.last.wakeAt)}`
+    : "No sleep logged yet.";
+  els.sleepAverageDuration.textContent = summary.average
+    ? formatDuration(summary.average)
+    : "--";
+  els.sleepAverageNote.textContent =
+    summary.average > 0
+      ? `${logs.slice(0, 7).length} logged night${logs.slice(0, 7).length === 1 ? "" : "s"} in view.`
+      : "Log a few nights to see trends.";
+
+  els.sleepBedtimeInput.value = state.sleep.bedtime;
+  els.sleepWakeInput.value = state.sleep.wakeTime;
+  els.sleepTargetHoursInput.value = state.sleep.targetHours;
+  els.sleepAlertLeadInput.value = `${state.sleep.alertLeadMinutes}`;
+  els.sleepBedtimeAlertsInput.checked = state.sleep.bedtimeAlerts;
+  els.sleepWakeAlertsInput.checked = state.sleep.wakeAlerts;
+
+  els.sleepLogCount.textContent = `${logs.length} logged`;
+  els.sleepLogList.innerHTML = "";
+
+  if (logs.length === 0) {
+    els.sleepLogList.innerHTML =
+      '<div class="empty-state">Log your first night of sleep to start tracking patterns.</div>';
+    return;
+  }
+
+  logs.slice(0, 10).forEach((log) => {
+    const card = document.createElement("article");
+    card.className = "sleep-log-card";
+    card.innerHTML = `
+      <div class="section-head">
+        <strong>${new Intl.DateTimeFormat(undefined, {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        }).format(new Date(log.date))}</strong>
+        <span class="chip subtle">${log.quality}</span>
+      </div>
+      <small>${formatDue(log.bedtimeAt)} to ${formatDue(log.wakeAt)}</small>
+      <div class="summary-row">
+        <strong>Duration</strong>
+        <small>${formatDuration(sleepDurationHours(log))}</small>
+      </div>
+    `;
+    els.sleepLogList.appendChild(card);
+  });
+}
+
 function renderDetail() {
   const assignment = getSelectedAssignment();
   if (!assignment) {
@@ -1226,9 +1504,11 @@ function render() {
   renderClasses();
   renderFilters();
   renderDashboard();
+  renderSleepHome();
   renderClassDashboard();
   renderReminders();
   renderCalendar();
+  renderSleepPage();
   renderTasks();
   renderProjects();
   renderAssignments();
@@ -1457,6 +1737,49 @@ function onSaveDetail(event) {
   saveAndRender();
 }
 
+function onSaveSleepSchedule(event) {
+  event.preventDefault();
+  state.sleep.bedtime = els.sleepBedtimeInput.value || state.sleep.bedtime;
+  state.sleep.wakeTime = els.sleepWakeInput.value || state.sleep.wakeTime;
+  state.sleep.targetHours = Math.min(
+    12,
+    Math.max(5, Number(els.sleepTargetHoursInput.value) || 8)
+  );
+  state.sleep.alertLeadMinutes = Number(els.sleepAlertLeadInput.value) || 45;
+  state.sleep.bedtimeAlerts = els.sleepBedtimeAlertsInput.checked;
+  state.sleep.wakeAlerts = els.sleepWakeAlertsInput.checked;
+  saveAndRender();
+  els.sleepScheduleStatus.textContent = "Sleep schedule updated.";
+  els.sleepLogStatus.textContent = "";
+}
+
+function onLogSleep(event) {
+  event.preventDefault();
+  if (!els.sleepLogBedtime.value || !els.sleepLogWake.value) return;
+  const bedtimeAt = new Date(els.sleepLogBedtime.value);
+  const wakeAt = new Date(els.sleepLogWake.value);
+
+  if (wakeAt <= bedtimeAt) {
+    els.sleepLogStatus.textContent = "Wake time needs to be after bedtime.";
+    return;
+  }
+
+  const log = {
+    id: createId("sleep"),
+    date: els.sleepLogDate.value || wakeAt.toISOString().slice(0, 10),
+    bedtimeAt: bedtimeAt.toISOString(),
+    wakeAt: wakeAt.toISOString(),
+    quality: els.sleepLogQuality.value,
+  };
+
+  state.sleep.logs = sortSleepLogs([log, ...state.sleep.logs]).slice(0, 30);
+  saveAndRender();
+  els.sleepLogForm.reset();
+  els.sleepLogStatus.textContent = "Sleep log added.";
+  els.sleepScheduleStatus.textContent = "";
+  initializeSleepDefaults();
+}
+
 function addSubtask() {
   const assignment = getSelectedAssignment();
   if (!assignment) return;
@@ -1550,6 +1873,8 @@ function bindEvents() {
   });
 
   els.assignmentForm.addEventListener("submit", onAddAssignment);
+  els.sleepScheduleForm.addEventListener("submit", onSaveSleepSchedule);
+  els.sleepLogForm.addEventListener("submit", onLogSleep);
   els.detailForm.addEventListener("submit", onSaveDetail);
   els.addSubtask.addEventListener("click", addSubtask);
   els.deleteAssignment.addEventListener("click", deleteSelectedAssignment);
@@ -1639,7 +1964,19 @@ function initializeDefaults() {
   els.dueInput.value = toLocalInputValue(addDays(new Date(), 1));
 }
 
+function initializeSleepDefaults() {
+  const today = new Date().toISOString().slice(0, 10);
+  els.sleepLogDate.value = today;
+  els.sleepLogBedtime.value = toLocalInputValue(
+    sleepDateTimeFor(addDays(new Date(), -1), state.sleep.bedtime)
+  );
+  els.sleepLogWake.value = toLocalInputValue(
+    sleepDateTimeFor(new Date(), state.sleep.wakeTime)
+  );
+}
+
 bindEvents();
 initializeDefaults();
+initializeSleepDefaults();
 render();
 maybeSendNotifications();
