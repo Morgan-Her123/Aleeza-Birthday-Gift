@@ -20,6 +20,7 @@ garmin_training_app/data/
 *.gif
 *.mov
 *.mp4
+!assets/welcome-video.mp4
 *.jpg
 *.jpeg
 *.png

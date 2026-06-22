@@ -1,4 +1,4 @@
-const CACHE_NAME = "homework-hq-v1";
+const CACHE_NAME = "homework-hq-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -27,6 +27,7 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (event.request.headers.has("range")) return;
 
   const requestUrl = new URL(event.request.url);
   if (requestUrl.origin !== self.location.origin) return;

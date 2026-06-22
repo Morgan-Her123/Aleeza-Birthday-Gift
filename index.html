@@ -454,6 +454,24 @@
       </main>
     </div>
 
+    <div id="welcome-video-overlay" class="welcome-video-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="welcome-video-title">
+      <section class="welcome-video-modal">
+        <div class="welcome-video-head">
+          <h2 id="welcome-video-title">Welcome to Homework HQ</h2>
+          <button id="close-welcome-video" class="video-close-button" type="button" aria-label="Close welcome video" title="Close">
+            &times;
+          </button>
+        </div>
+        <video id="welcome-video" controls playsinline preload="metadata">
+          <source src="assets/welcome-video.mp4" type="video/mp4" />
+        </video>
+      </section>
+    </div>
+
+    <button id="open-welcome-video" class="floating-video-button" type="button" aria-label="Watch welcome video" title="Watch welcome video">
+      <span aria-hidden="true">&#9654;</span>
+    </button>
+
     <template id="assignment-card-template">
       <article class="assignment-card">
         <div class="assignment-card-head">

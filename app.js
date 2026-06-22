@@ -1,5 +1,6 @@
 const STORAGE_KEY = "homework-hq-state-v2";
 const NOTIFICATION_KEY = "homework-hq-notifications-v2";
+const WELCOME_VIDEO_KEY = "homework-hq-welcome-video-seen-v1";
 const STATUS_ORDER = [
   "not_started",
   "in_progress",
@@ -50,6 +51,10 @@ const els = {
   installPanel: document.getElementById("install-panel"),
   installApp: document.getElementById("install-app"),
   installStatus: document.getElementById("install-status"),
+  welcomeVideoOverlay: document.getElementById("welcome-video-overlay"),
+  welcomeVideo: document.getElementById("welcome-video"),
+  openWelcomeVideo: document.getElementById("open-welcome-video"),
+  closeWelcomeVideo: document.getElementById("close-welcome-video"),
   startFresh: document.getElementById("start-fresh"),
   clearCompleted: document.getElementById("clear-completed"),
   dueTodayList: document.getElementById("due-today-list"),
@@ -2037,9 +2042,53 @@ function initializePwa() {
   });
 }
 
+function closeWelcomeVideo() {
+  els.welcomeVideo?.pause();
+  els.welcomeVideoOverlay?.classList.add("hidden");
+  document.body.classList.remove("video-dialog-open");
+}
+
+async function openWelcomeVideo({ autoplay = false } = {}) {
+  if (!els.welcomeVideo || !els.welcomeVideoOverlay) return;
+
+  els.welcomeVideoOverlay.classList.remove("hidden");
+  document.body.classList.add("video-dialog-open");
+
+  if (!autoplay) {
+    els.welcomeVideo.play().catch(() => {});
+    return;
+  }
+
+  els.welcomeVideo.muted = false;
+  try {
+    await els.welcomeVideo.play();
+  } catch {
+    els.welcomeVideo.muted = true;
+    els.welcomeVideo.play().catch(() => {});
+  }
+}
+
+function initializeWelcomeVideo() {
+  els.openWelcomeVideo?.addEventListener("click", () => openWelcomeVideo());
+  els.closeWelcomeVideo?.addEventListener("click", closeWelcomeVideo);
+  els.welcomeVideo?.addEventListener("ended", closeWelcomeVideo);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !els.welcomeVideoOverlay?.classList.contains("hidden")) {
+      closeWelcomeVideo();
+    }
+  });
+
+  if (!localStorage.getItem(WELCOME_VIDEO_KEY)) {
+    localStorage.setItem(WELCOME_VIDEO_KEY, "seen");
+    openWelcomeVideo({ autoplay: true });
+  }
+}
+
 bindEvents();
 initializeDefaults();
 initializeSleepDefaults();
 initializePwa();
+initializeWelcomeVideo();
 render();
 maybeSendNotifications();

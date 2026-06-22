@@ -211,6 +211,92 @@ p {
   line-height: 1.55;
 }
 
+.video-dialog-open {
+  overflow: hidden;
+}
+
+.welcome-video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(25, 31, 34, 0.82);
+}
+
+.welcome-video-overlay.hidden {
+  display: none;
+}
+
+.welcome-video-modal {
+  width: min(920px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: #fffaf2;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+}
+
+.welcome-video-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+}
+
+.welcome-video-head h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.video-close-button,
+.floating-video-button {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.video-close-button {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: none;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.welcome-video-modal video {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 112px);
+  background: #111;
+}
+
+.floating-video-button {
+  position: fixed;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 900;
+  width: 54px;
+  height: 54px;
+  background: var(--blue);
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 32px rgba(32, 50, 58, 0.3);
+  font-size: 1.15rem;
+}
+
+.floating-video-button span {
+  margin-left: 3px;
+}
+
 .panel {
   border-radius: var(--radius);
   padding: 20px;
@@ -772,5 +858,22 @@ p {
   .summary-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .welcome-video-overlay {
+    padding: 10px;
+  }
+
+  .welcome-video-modal {
+    max-height: calc(100vh - 20px);
+  }
+
+  .welcome-video-head {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .welcome-video-modal video {
+    max-height: calc(100vh - 92px);
   }
 }
